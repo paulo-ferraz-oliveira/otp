@@ -524,7 +524,7 @@
            %% Used on an unconnected socket to specify the
            %% destination address for a message.
            addr => sockaddr(),
-                    
+
            iov := erlang:iovec(),
 
            %% *Optional* control message list (ancillary data).
@@ -736,7 +736,7 @@ which_sockets() ->
 
 which_sockets(Domain)
   when ((Domain =:= inet) orelse (Domain =:= inet6)) ->
-    ?REGISTRY:which_sockets(fun(#{domain := D}) when (D =:= Domain) -> true; 
+    ?REGISTRY:which_sockets(fun(#{domain := D}) when (D =:= Domain) -> true;
                                (_) -> false end);
 which_sockets(Type)
   when ((Type =:= stream) orelse (Type =:= dgram) orelse (Type =:= seqpacket)) ->
@@ -795,7 +795,7 @@ use_registry(D) when is_boolean(D) ->
 %% Generates a list of various info about the socket, such as counter values.
 %%
 %% Do *not* call this function often.
-%% 
+%%
 %% ===========================================================================
 
 -spec info() -> info().
@@ -817,11 +817,11 @@ info(Socket) ->
 %%
 %% supports - get information about what the platform "supports".
 %%
-%% Generates a list of various info about what the plaform can support. 
-%% The most obvious case is 'options'. 
+%% Generates a list of various info about what the plaform can support.
+%% The most obvious case is 'options'.
 %%
 %% Each item in a 'supports'-list will appear only *one* time.
-%% 
+%%
 %% ===========================================================================
 
 -spec supports() -> [{Key1 :: term(),
@@ -877,7 +877,7 @@ is_supported(options, Level, Opt) when is_atom(Level), is_atom(Opt) ->
 %% The nif sets up a monitor to this process, and if it dies the socket
 %% is closed. It is also used if someone wants to monitor the socket.
 %%
-%% We may therefor need monitor function(s): 
+%% We may therefor need monitor function(s):
 %%
 %%               socket:monitor(Socket)
 %%               socket:demonitor(Socket)
@@ -900,7 +900,7 @@ open(FD) when is_integer(FD) ->
     open(FD, #{});
 open(FD) ->
     erlang:error(badarg, [FD]).
-                  
+
 -spec open(FD, Opts) -> {'ok', Socket} | {'error', Reason} when
       FD       :: integer(),
       Opts     ::
@@ -1017,7 +1017,7 @@ bind(Socket, Addr) ->
 %%
 %% bind - Add or remove a bind addresses on a socket
 %%
-%% Calling this function is only valid if the socket is: 
+%% Calling this function is only valid if the socket is:
 %%   type     = seqpacket
 %%   protocol = sctp
 %%
@@ -1242,7 +1242,7 @@ accept_deadline(LSockRef, Deadline) ->
     case prim_socket:accept(LSockRef, AccRef) of
         select ->
             %% Each call is non-blocking, but even then it takes
-            %% *some* time, so just to be sure, recalculate before 
+            %% *some* time, so just to be sure, recalculate before
             %% the receive.
 	    Timeout = timeout(Deadline),
             receive
@@ -2228,7 +2228,7 @@ sendmsg_deadline_cont(SockRef, Data, Cont, Deadline, HasWritten) ->
       Socket :: socket(),
       Data   :: binary(),
       Reason :: posix() | 'closed' | invalid().
-                          
+
 recv(Socket) ->
     recv(Socket, 0, ?ESOCK_RECV_FLAGS_DEFAULT, ?ESOCK_RECV_TIMEOUT_DEFAULT).
 
@@ -2631,7 +2631,7 @@ recvfrom(Socket, BufSz) ->
       Data    :: binary(),
       Reason  :: posix() | 'closed' | invalid() | 'timeout';
 
-              (Socket, BufSz, Flags) -> 
+              (Socket, BufSz, Flags) ->
                       {'ok', {Source, Data}} |
                       {'error', Reason} when
       Socket :: socket(),
@@ -3067,12 +3067,12 @@ recvmsg_result(Result) ->
 %%
 %% Closing a socket is a two stage rocket (because of linger).
 %% We need to perform the actual socket close while in BLOCKING mode.
-%% But that would hang the entire VM, so what we do is divide the 
-%% close in two steps: 
+%% But that would hang the entire VM, so what we do is divide the
+%% close in two steps:
 %% 1) prim_socket:nif_close + the socket_stop (nif) callback function
 %%    This is for everything that can be done safely NON-BLOCKING.
 %% 2) prim_socket:nif_finalize_close which is executed by a *dirty* scheduler
-%%    Before we call the socket close function, we set the socket 
+%%    Before we call the socket close function, we set the socket
 %%    BLOCKING. Thereby linger is handled properly.
 
 -spec close(Socket) -> 'ok' | {'error', Reason} when
@@ -3085,7 +3085,7 @@ close(?socket(SockRef))
         ok ->
             prim_socket:finalize_close(SockRef);
         {ok, CloseRef} ->
-            %% We must wait for the socket_stop callback function to 
+            %% We must wait for the socket_stop callback function to
             %% complete its work
             receive
                 ?socket_msg(?socket(SockRef), close, CloseRef) ->
@@ -3307,9 +3307,9 @@ cancel(?socket(SockRef), ?SELECT_INFO(Tag, Ref))
   when is_reference(SockRef) ->
     case Tag of
         {OpName, _} when is_atom(OpName) ->
-            cancel(SockRef, Tag, Ref);
+            cancel(SockRef, OpName, Ref);
         OpName when is_atom(OpName) ->
-            cancel(SockRef, Tag, Ref)
+            cancel(SockRef, OpName, Ref)
     end;
 cancel(Socket, SelectInfo) ->
     erlang:error(badarg, [Socket, SelectInfo]).
